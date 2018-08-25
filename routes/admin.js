@@ -51,6 +51,7 @@ var upload = multer({ dest: 'public/uploads/' })
 
 
 });
+
  router.post('/login',(req,res)=>{
 
 	let body = req.body;
@@ -94,7 +95,30 @@ var upload = multer({ dest: 'public/uploads/' })
 	res.json(result);
 
 });
+router.get('/count',(req,res)=>{
+	let result  = {
+		code:0,// 0 代表成功 
+		message:'',
+		data:{
+			usernumber:1666,
+			ordernumber:1888,
+			productnumber:1999
+		}
 
+	}
+	res.json(result)
+});
+/*router.use((req,res,next)=>{
+	if(req.userInfo.isAdmin){
+		next()
+	}else{
+		res.send(
+			{
+				code:10
+			}
+		);
+	}
+})*/
  router.get('/users',(req,res)=>{
 
 	let options ={
@@ -118,6 +142,8 @@ var upload = multer({ dest: 'public/uploads/' })
 	})
  	
 });
+
+
 
 router.post('/uploadImages',upload.single('upload'),(req,res)=>{
 	let path = "/uploads/"+req.file.filename;
@@ -173,7 +199,7 @@ router.get("/site",(req,res)=>{
 					site:site
 			});	
 		}else{
-			// console.log(err)
+			
 		}
 	})
 

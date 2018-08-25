@@ -39,7 +39,7 @@ app.set('view engine' , 'html');
 app.use(express.static('public'));
 
 app.use(session({
-  name:'blid',
+  name:'kmid',
   secret: 'keyboard cat',
   resave: true,
   saveUninitialized: true,
@@ -50,6 +50,15 @@ app.use(session({
  store:new MongoStore({ mongooseConnection: mongoose.connection })   
 }));
 
+
+app.use((req,res,next)=>{
+
+	if(req.mrthod == "OPTIONS"){
+		res.send("OPTIONS OK ")
+	}else{
+		next()
+	}
+})
 app.use((req,res,next)=>{
 	// req.userInfo = {};
 
@@ -89,10 +98,7 @@ app.use('/resource',require('./routes/resource.js'));
 
 app.use('/home',require('./routes/home.js'));
 
-
-
-
-app.listen(3000,()=>{
+app.listen(3000,'127.0.0.1',()=>{
 	console.log('server is running 127.0.0.1:3000');
 })
 
