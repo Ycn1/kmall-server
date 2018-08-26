@@ -17,21 +17,10 @@ const hmac = require('../util/hamc.js')
 
 var upload = multer({ dest: 'public/uploads/' })
 
- /*router.use((req,res,next)=>{
- 	
- 	if(req.userInfo.isAdmin){
- 		next()
- 	}else{
- 		res.send("<h1>请使用管理员账户登录</h1>");
- 	}
 
- });
-*/
+
 
 /*router.use('/init',(req,res)=>{
-
-		
-
 				// hmac.update(req.body.password);
 				 new UserModel({
 					username:"admin",
@@ -51,6 +40,7 @@ var upload = multer({ dest: 'public/uploads/' })
 
 
 });
+
 
  router.post('/login',(req,res)=>{
 
@@ -95,7 +85,20 @@ var upload = multer({ dest: 'public/uploads/' })
 	res.json(result);
 
 });
-router.get('/count',(req,res)=>{
+
+
+ router.use((req,res,next)=>{
+ 	
+ 	if(req.userInfo.isAdmin){
+ 		next()
+ 	}else{
+ 		res.send({
+				code:10
+			});
+ 	}
+
+ });
+ router.get('/count',(req,res)=>{
 	let result  = {
 		code:0,// 0 代表成功 
 		message:'',
@@ -108,17 +111,7 @@ router.get('/count',(req,res)=>{
 	}
 	res.json(result)
 });
-/*router.use((req,res,next)=>{
-	if(req.userInfo.isAdmin){
-		next()
-	}else{
-		res.send(
-			{
-				code:10
-			}
-		);
-	}
-})*/
+
  router.get('/users',(req,res)=>{
 
 	let options ={
