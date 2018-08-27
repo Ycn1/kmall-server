@@ -17,9 +17,6 @@ const hmac = require('../util/hamc.js')
 
 var upload = multer({ dest: 'public/uploads/' })
 
-
-
-
 /*router.use('/init',(req,res)=>{
 				// hmac.update(req.body.password);
 				 new UserModel({
@@ -37,10 +34,7 @@ var upload = multer({ dest: 'public/uploads/' })
 		userInfo:req.userInfo
 	});
 
-
-
 });
-
 
  router.post('/login',(req,res)=>{
 
@@ -86,7 +80,7 @@ var upload = multer({ dest: 'public/uploads/' })
 
 });
 
-
+//权限控制
  router.use((req,res,next)=>{
  	
  	if(req.userInfo.isAdmin){
@@ -113,25 +107,34 @@ var upload = multer({ dest: 'public/uploads/' })
 });
 
  router.get('/users',(req,res)=>{
-
+ 	
 	let options ={
 		page:req.query.page,
 		model:UserModel,
 		query:{},
-		projection:'_id username isAdmin',
+		projection:'',
 		sort:{_id:1}
 	}
 	pagination(options)
 	.then((data)=>{
-		
-		res.render('admin/users_list',{
-				userInfo:req.userInfo,
-				users:data.docs,
-				page:data.page,
+		console.log("user!!",data)
+
+		res.json({
+			code :0,
+			data:{
 				list:data.list,
+				page:data.page,
+				total:data.total,
+				pageSize:data.pageSize
+			}
+		});
+		/*res.render('admin/users_list',{
+				userInfo:req.userInfo,
+				list:data.list,
+				page:data.page,
 				url:'/admin/users',
 				pages:data.pages,
-		});	
+		});	*/
 	})
  	
 });

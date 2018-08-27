@@ -7,37 +7,55 @@
  const router = new Router();
  const pagination = require('../util/pagination.js')
 
+//权限控制
+ router.use((req,res,next)=>{
+ 	
+ 	if(req.userInfo.isAdmin){
+ 		next()
+ 	}else{
+ 		res.send({
+			code:10
+		});
+ 	}
 
+ });
 
- router.get('/',(req,res)=>{
-	// res.render('index');
-	// res.send("index ok");
-	/*res.render('admin/category',{
-		userInfo:req.userInfo
-	});*/
-	let options ={
-		page:req.query.page,
-		model:categoryModel,
-		query:{},
-		projection:'_id name order',
-		sort:{order:1}
-	}
-	pagination(options)
-	.then((data)=>{
-		// console.log(data);
-		res.render('admin/category',{
-				userInfo:req.userInfo,
-				categories:data.docs,
-				page:data.page,
-				list:data.list,
-				pages:data.pages,
-				url:'/category'
-		});	
+router.post('/',(req,res)=>{
+	let body = req.body;
+	categoryModel.findOne({name:body.name,pid:body.pid})
+	.then((cate)=>{
+		if(cate){
+			res.json({
+					code:1,
+					message:"分类插入失败，已有分类"
+				});
+		}else{
+			new categoryModel({
+				name:body.name,
+				pid:body.pid
+			})
+			.save()
+			.then((newCate)=>{
+
+				if(newCate){
+					res.json({
+						code:0,
+					});
+				}
+			})
+			.err((e)=>{
+				res.json({
+						code:1,
+						message:"分类插入失败，服务器错误"
+					});
+			})
+		}
 	})
-
 	
 
 });
+
+
 
 
  router.get('/add',(req,res)=>{

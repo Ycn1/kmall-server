@@ -12,8 +12,16 @@ const newSchema = new mongoose.Schema({
 		  	isAdmin:{
 		  		type:Boolean,
 		  		default:false
+		  	},
+		  	email:{
+		  		type:String
+		  	},
+		  	phone:{
+		  		type:Number
 		  	}
 
+		},{
+			timestamps:true
 		}); 
 
 

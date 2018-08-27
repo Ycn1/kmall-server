@@ -8,6 +8,23 @@ const hmac = require('../util/hamc.js')
 
 // const hmac = crypto.createHmac('sha256', 'ycnsgxnh');
 
+
+/*router.get('/init',(req,res)=>{
+	const users = [];
+	for(let i = 0;i<100;i++){
+		users.push({
+			username:'test'+i,
+			password:hmac('test'+i),
+			isAdmin:false,
+			phone:'12344556'+i,
+			email:'test'+i+'@kuazhu.com'
+		})
+	}
+	UserModel.create(users)
+	.then((result)=>{
+		res.send('ok');
+	})
+})*/
  router.post('/login',(req,res)=>{
 	// res.render('index');
 	// res.send("index ok");

@@ -20,15 +20,13 @@ let pagination = (options) =>{
 				if(page > pages){
 					page = pages;
 				}
-				let list = [];
+			
 
 				if(pages == 0){
 					page = 1;
 				}
 
-				for(let i = 1;i<=pages;i++){
-					list.push(i);
-				}
+			
 				
 				let skip = (page - 1)*limit;
 
@@ -45,10 +43,11 @@ let pagination = (options) =>{
 				.limit(limit)
 				.then((docs)=>{
 					resolve({
-						docs:docs,
+						list:docs,
 						page:page*1,
-						list:list,
-						pages:pages
+						pages:pages,
+						pageSize:limit,
+						total:count
 					});
 					// res.render('admin/users_list',{
 						
