@@ -37,11 +37,25 @@ router.post('/',(req,res)=>{
 			.save()
 			.then((newCate)=>{
 
-				if(newCate){
-					res.json({
-						code:0,
-					});
+				if(body.pid==0){
+					categoryModel.find({pid:body.pid})
+								.then(result=>{
+									res.json({
+										code:0,
+										data:result
+									});
+								})
+					
 				}
+				else{
+					res.json({
+							code:0,
+							message:"分类插入成功"
+							
+						});
+				}
+					
+				
 			})
 			.err((e)=>{
 				res.json({
@@ -56,8 +70,146 @@ router.post('/',(req,res)=>{
 });
 
 
+router.get('/',(req,res)=>{
+	let pid = req.query.pid;
+	let page = req.query.page;
+
+	if(page){
+
+		/*let options ={
+			page:req.query.page,
+			model:categoryModel,
+			query:{pid:pid},
+			projection:'',
+			sort:{order:1}
+		}
+		pagination(options)*/
+
+		categoryModel
+		.getPaginationCategory(req,{pid:pid})
+		.then((data)=>{
+			
+
+			res.json({
+				code :0,
+				data:{
+					list:data.list,
+					current:data.current,
+					total:data.total,
+					pageSize:data.pageSize
+				}
+			})
+		})
+
+	}else{
+		categoryModel.find({pid:pid})
+				.then((categories)=>{
+				
+					res.json({
+						code:0,
+						data:categories
+						
+					})
+				})
+				.catch(e=>{
+					res.json({
+						code:1,
+						message:"获取分类失败!!!"
+					})
+				})
+	}
+	
+
+});
+
+router.put('/update/',(req,res)=>{
+	
+	let body = req.body;
+		console.log("0",body)
+	categoryModel
+	.findOne({name:body.name,pid:body.pid})
+	.then((category)=>{
+		if(category){
+			res.json({
+						code:1,
+						message:"分类名称修改失败,已有同名分类"
+					})
+		}else{
+			categoryModel.update({_id:body.id},{name:body.name})
+			.then(cate=>{
+				if(cate){
+					categoryModel.getPaginationCategory(body.page,{pid:body.pid})
+					.then((data)=>{
+					
+							res.json({
+								code :0,
+								data:{
+									list:data.list,
+									current:data.current,
+									total:data.total,
+									pageSize:data.pageSize
+								}
+							})
+					})
+				}else{
+						res.json({
+							code:1,
+							message:"分类名称修改失败,数据库错误"
+						})
+				}
+			})
+			
+		}
+})
+	.catch(e=>{
+		res.json({
+							code:1,
+							message:"分类名称修改失败"
+						})
+	})
+})
+
+router.put('/updateOrder',(req,res)=>{
+	let body = req.body;
+
+		categoryModel.update({_id:body.id},{order:body.order})
+			.then(cate=>{
+				if(cate){
+					categoryModel.getPaginationCategory(body.page,{pid:body.pid})
+					.then(data=>{
+							res.json({
+								code :0,
+								data:{
+									list:data.list,
+									current:data.current,
+									total:data.total,
+									pageSize:data.pageSize
+								}
+							})
+					})
+				}else{
+						res.json({
+							code:1,
+							message:"分类名称修改失败,数据库错误"
+						})
+				}
+			})
+})
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+//so far so far
  router.get('/add',(req,res)=>{
 	// res.render('index');
 	// res.send("index ok");
@@ -187,7 +339,7 @@ router.post('/update/',(req,res)=>{
 														
 													})
 												}
-											});
+											})
 										}
 										
 									})

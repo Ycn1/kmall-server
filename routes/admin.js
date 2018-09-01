@@ -39,7 +39,7 @@ var upload = multer({ dest: 'public/uploads/' })
  router.post('/login',(req,res)=>{
 
 	let body = req.body;
-	console.log("111",body);
+
 
 	let result = {
 		code:0,
@@ -117,13 +117,12 @@ var upload = multer({ dest: 'public/uploads/' })
 	}
 	pagination(options)
 	.then((data)=>{
-		console.log("user!!",data)
-
+		
 		res.json({
 			code :0,
 			data:{
 				list:data.list,
-				page:data.page,
+				current:data.current,
 				total:data.total,
 				pageSize:data.pageSize
 			}

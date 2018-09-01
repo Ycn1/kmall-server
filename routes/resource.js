@@ -60,7 +60,7 @@ router.get('/add',(req,res)=>{
 	});
 });
 
-
+//处理新增资源
 router.post('/add',upload.single('file'),(req,res)=>{
 
 	new ResourceModel({

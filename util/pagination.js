@@ -8,13 +8,13 @@ let pagination = (options) =>{
 	 		page = parseInt(options.page);
 	 	}
 
-	 	let limit = 5;
+	 	let limit = 2;
 	 	
 	 	if(page <= 0){
 	 		page = 1;
 	 	}
 
-	 	options.model.estimatedDocumentCount({})
+	 	options.model.countDocuments(options.query)
 			.then((count)=>{
 				let pages = Math.ceil(count / limit);
 				if(page > pages){
@@ -44,8 +44,8 @@ let pagination = (options) =>{
 				.then((docs)=>{
 					resolve({
 						list:docs,
-						page:page*1,
-						pages:pages,
+						current:page*1,
+					
 						pageSize:limit,
 						total:count
 					});
