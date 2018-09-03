@@ -109,6 +109,40 @@ router.post('/add',(req,res)=>{
 		
 	})
 
+router.put('/add',(req,res)=>{
+	
+	let body = req.body;
+
+			let update = 	{
+				name:body.name,
+				dec:body.dec,
+				price:body.price,
+				image:body.image,
+				detail:body.detail,
+				stock:body.stock,
+				Category:body.CategoryId,
+
+			}
+			ProductModel
+			.update({_id:body.id},update)
+			.then((raw)=>{
+
+				res.json({
+					code:0,
+					message:"编辑商品成功"
+				})
+			})
+			
+			.catch(e=>{
+				res.json({
+						code :1,
+						message:'编辑商品成功失败'
+					})
+			})
+		
+	})
+
+
 router.get('/',(req,res)=>{
 
 	let page = req.query.page;
@@ -204,6 +238,40 @@ router.get('/edit',(req,res)=>{
 					data:product
 				})
 		})
+		.catch(e=>{
+			res.json({
+				code:1,
+				message:"失败"
+			})
+		})
+			
+})
+router.get('/serarchName',(req,res)=>{
+	
+
+	let id = req.query.id;
+
+	let keyword = req.query.keyword;
+
+	let page =  req.query.page;
+	ProductModel
+	.getPaginationProduct(page,{
+		name:{$regex:new RegExp(keyword,'i')}
+	})
+	.then(data=>{
+			res.json({
+				code :0,
+				
+				data:{
+					list:data.list,
+					current:data.current,
+					total:data.total,
+					pageSize:data.pageSize,
+					status:data.status,
+					keyword:keyword
+				}
+			})
+	})
 		.catch(e=>{
 			res.json({
 				code:1,
