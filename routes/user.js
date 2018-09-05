@@ -95,6 +95,18 @@ router.post('/register',(req,res)=>{
 	});
 });
 
+ router.use((req,res,next)=>{
+ 	
+ 	if(req.userInfo.isAdmin){
+ 		next()
+ 	}else{
+ 		res.send({
+			code:10
+		});
+ 	}
+
+ });
+
 router.get('/logout',(req,res)=>{
 	let result  = {
 		code:0,// 0 代表成功 

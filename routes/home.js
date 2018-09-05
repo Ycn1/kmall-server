@@ -23,9 +23,6 @@ var upload = multer({ dest: 'public/uploads/' })
 	res.render('home/index',{
 		userInfo:req.userInfo
 	});
-
-
-
 });
 
  router.get('/logout',(req,res)=>{
