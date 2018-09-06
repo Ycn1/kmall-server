@@ -6,42 +6,17 @@ const hmac = require('../util/hamc.js')
 
  const router = new Router();
 
-// const hmac = crypto.createHmac('sha256', 'ycnsgxnh');
-
-
-/*router.get('/init',(req,res)=>{
-	const users = [];
-	for(let i = 0;i<100;i++){
-		users.push({
-			username:'test'+i,
-			password:hmac('test'+i),
-			isAdmin:false,
-			phone:'12344556'+i,
-			email:'test'+i+'@kuazhu.com'
-		})
-	}
-	UserModel.create(users)
-	.then((result)=>{
-		res.send('ok');
-	})
-})*/
  router.post('/login',(req,res)=>{
-	// res.render('index');
-	// res.send("index ok");
-	// console.log('111');
-	// console.log(req.body);
 	let body = req.body;
 	let result = {
 		code:0,
 		message:''
 	};
 	UserModel
-	.findOne({username:body.username,password:hmac(body.password)})
+	.findOne({username:body.username,password:hmac(body.password),isAdmin:false})
 	.then((user)=>{
 		console.log(user);
 		if(user){//登录成功
-			 // result.data 
-			 // req.cookies.set('userInfo',JSON.stringify(result.data));
 			 req.session.userInfo = {
 			 	_id:user._id,
 			 	username:user.username,
@@ -50,15 +25,54 @@ const hmac = require('../util/hamc.js')
 			 console.log(req.session);
 			 res.json(result);
 		}else{
-			result.code = 10;
+			result.code = 1;
 			result.message = '用户名和密码错误'
 			res.json(result);
 		}
-	})
+	})	
+});
+ 
+//注册新的用户
+router.post('/',(req,res)=>{
+	let body = req.body;
+	let result = {
+		code:0,
+		message:''
+	};
+	UserModel
+	.findOne({username:body.username})
+	.then((user)=>{
+		
+		if(user){//登录成功
+			res.json({
+				code :1,
+				message:"用户名已存在"
+			})
+		}else{
+			result.code = 0;
+			
+			res.json(result);
+		}
+	})	
+});
+router.get('/namerigister',(req,res)=>{
 
-	
-
-	
+	UserModel
+	.findOne({username:req.query.username})
+	.then((user)=>{
+		
+		if(user){
+			res.json({
+				code : 1,
+				message :'用户名已存在'
+			});
+		}else{
+			res.json({
+				code:0
+			})
+			
+		}
+	})	
 });
 
 router.post('/register',(req,res)=>{
@@ -69,14 +83,13 @@ router.post('/register',(req,res)=>{
 
 	UserModel.findOne({username:req.body.username},(err,data)=>{
 		if(!err){//没有一样的username
-
-
-			console.log(data);
 			if(!data){
 				// hmac.update(req.body.password);
 				 new UserModel({
 					username:req.body.username,
 					password:hmac(req.body.password),
+					phone:req.body.phone,
+					email:req.body.email,
 					
 				
 				}).save((err,data)=>{
@@ -84,17 +97,18 @@ router.post('/register',(req,res)=>{
 				})
 				
 			}else{
-				result.code = 10;
+				result.code = 1;
 				result.message = '用户已存在';
 				res.json(result);
 
 			}
 		}else{
-			result.code = 10;
+			result.code = 1;
 		}
 	});
 });
 
+/*
  router.use((req,res,next)=>{
  	
  	if(req.userInfo.isAdmin){
@@ -105,7 +119,7 @@ router.post('/register',(req,res)=>{
 		});
  	}
 
- });
+ });*/
 
 router.get('/logout',(req,res)=>{
 	let result  = {
@@ -117,7 +131,18 @@ router.get('/logout',(req,res)=>{
 	res.json(result);
 
 });
-
+router.get('/userInfo',(req,res)=>{
+	if(req.userInfo._id){
+		res.json({
+			code :0,
+			data:req.userInfo
+		})
+	}else{
+		res.json({
+			code:10
+		})
+	}
+})
 router.get('/repassword',(req,res)=>{
 	
 })
