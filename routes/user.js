@@ -2,6 +2,7 @@
 
 const UserModel = require('../models/user.js');
 
+const ProductModel = require('../models/product.js');
 const hmac = require('../util/hamc.js')
 
  const router = new Router();
@@ -135,8 +136,68 @@ router.get('/username',(req,res)=>{
 			code:1
 		})
 	}
-})
+});
+router.get('/productList',(req,res)=>{
+	let page = req.query.page;
+	let query = {status:0};
+	if(req.query.categoryId){
 
+		query.CategoryId = req.query.categoryId
+	}else{
+		query.name = {$regex:new RegExp(req.query.keyword,'i')}
+	}
+
+	let sort  = {order:-1}
+
+	if(req.query.orderBy == 'price_asc'){
+		sort  = {price:1}
+	}else{
+		sort  = {price:-1}
+	}
+	let projection = '';
+
+	ProductModel.getPaginationProduct(page,query,projection,sort)
+	.then(result=>{
+		console.log(result)
+		res.json({
+			code :0,
+			data:{
+				list:result.list,
+				current:result.current,
+				total:result.total,
+				pageSize:result.pageSize,
+				status:result.status
+			}
+		})
+	})
+	.catch(e=>{
+		res.json({
+			code :1,
+		})
+	})
+
+
+});
+
+router.get('/productDetail',(req,res)=>{
+	
+	ProductModel
+	.findOne({status:0,_id:req.query.productId},'-__v -createAt')
+	.then(product=>{
+		
+		res.json({
+			code:0,
+			data:product
+		})
+	})
+	.catch(e=>{
+		res.json({
+			code:1,
+			msg:"获取详情失败"
+		})
+	})
+});
+//权限控制
  router.use((req,res,next)=>{
  	
  	if(req.userInfo._id){

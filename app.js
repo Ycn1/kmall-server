@@ -92,6 +92,7 @@ app.use('/category',require('./routes/category.js'));
 
 app.use('/product',require('./routes/product.js'));
 
+app.use('/cart',require('./routes/cart.js'));
 
 app.use('/article',require('./routes/article.js'));
 

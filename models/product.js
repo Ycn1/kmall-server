@@ -40,15 +40,15 @@ const productSchema = new mongoose.Schema({
 			timestamps:true
 		}); 
 
-productSchema.statics.getPaginationProduct = function(page,query={}){
+productSchema.statics.getPaginationProduct = function(page,query={},projection='name status order _id dec stock image price stock',sort={order:-1},){
     return new Promise((resolve,reject)=>{
       let options = {
         page: page,
         model:this, 
         query:query, 
-        projection:'-__v', 
-        sort:{order:-1}, 
-        // populate:[{path:'category',select:'name'},{path:'user',select:'username'}]
+        projection:projection, 
+        sort:sort, 
+        populate:[{path:'CategoryId',select:' pid _id'}]
       }
       pagination(options)
       .then((data)=>{
