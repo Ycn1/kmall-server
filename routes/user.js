@@ -21,6 +21,7 @@ router.post('/register',(req,res)=>{
 					password:hmac(req.body.password),
 					phone:req.body.phone,
 					email:req.body.email,
+				
 					
 				
 				}).save((err,data)=>{

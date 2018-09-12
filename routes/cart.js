@@ -27,11 +27,19 @@ const hmac = require('../util/hamc.js')
  	.findById(req.userInfo._id)
  	.then(user=>{
  		if(user.cart){
- 			// let cartItem  =  user.cart.findOne()
- 			user.cart.cartList.push({
- 				product: req.body.product,
- 				count:req.body.count
+ 			//如果购物车里面已经有此产品，数量增加即可
+ 			let cartItem  =  user.cart.cartList.find((item)=>{
+ 				return item.product == req.body.product
  			})
+ 			if(cartItem){
+ 				cartItem.count = cartItem.count + parseInt(req.body.count)
+ 			}else{
+ 				user.cart.cartList.push({
+	 				product: req.body.product,
+	 				count:req.body.count
+ 				})
+ 			}
+ 			
  		}else{
  			user.cart = {
  				cartList:[
@@ -45,7 +53,7 @@ const hmac = require('../util/hamc.js')
  		}
  		user.save()
  		.then(newUser=>{
- 			console.log(newUser)
+ 		
  				res.json({
  					code:0,
  					message:"插入成功",
@@ -73,6 +81,87 @@ const hmac = require('../util/hamc.js')
 
  	})
  	
+ });
+ router.put('/selectone',(req,res)=>{
+
+ 	UserModel
+ 	.findById(req.userInfo._id)
+ 	.then(user=>{
+ 		if(user.cart){
+ 			//如果购物车里面已经有此产品，数量增加即可
+ 			let cartItem  =  user.cart.cartList.find((item)=>{
+ 				return item.product == req.body.productId
+ 			})
+ 			if(cartItem){
+
+ 				cartItem.check = true
+ 			}else{
+ 				res.json({
+ 					code:1,
+ 					message:"购物车记录不存在",
+
+ 				}) 
+ 			}
+ 			
+ 		}else{
+ 			res.json({
+ 					code:1,
+ 					message:"还没有购物车",
+
+ 				}) 
+ 		}
+ 		user.save()
+ 		.then(newUser=>{
+ 		
+ 				user.getCart()
+ 				.then(cart=>{
+ 					res.json({
+ 						code:0,
+ 						data:cart
+ 					})
+ 				})	
+ 		})
+ 	})
+ });
+ router.put('/unselectone',(req,res)=>{
+
+ 	UserModel
+ 	.findById(req.userInfo._id)
+ 	.then(user=>{
+ 		if(user.cart){
+ 			//如果购物车里面已经有此产品，数量增加即可
+ 			let cartItem  =  user.cart.cartList.find((item)=>{
+ 				return item.product == req.body.productId
+ 			})
+ 			if(cartItem){
+ 				cartItem.check = false
+ 			}else{
+ 				res.json({
+ 					code:1,
+ 					message:"购物车记录不存在",
+
+ 				}) 
+ 			}
+ 			
+ 		}else{
+ 			res.json({
+ 					code:1,
+ 					message:"还没有购物车",
+
+ 				}) 
+ 		}
+ 		user.save()
+ 		.then(newUser=>{
+ 		
+ 				user.getCart()
+ 				.then(cart=>{
+ 					res.json({
+ 						code:0,
+ 						data:cart
+ 					})
+ 				})	
+ 		})
+ 	})
  })
  module.exports = router;
 

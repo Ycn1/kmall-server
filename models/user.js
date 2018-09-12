@@ -12,7 +12,8 @@ const CartItem  =  new mongoose.Schema({
 		deafult:0
 	},
 	count:{
-		type:Number
+		type:Number,
+		deafult:1
 	},
 	check:{
 		type:Boolean,
@@ -63,15 +64,16 @@ const newSchema = new mongoose.Schema({
 		return new Promise((resolve,reject)=>{
 			var _this = this;
 			if(!this.cart){
-				return (null);
+				resolve({
+					cartList:[]
+				});
 			}
 			//map方法返回的就是一个数组
-			let getCartItems = function(){
-				return _this.cart.cartList.map(CartItem=>{
-					console.log("::::111",CartItem)
+			let getCartItems =  this.cart.cartList.map(CartItem=>{
+					
 					return ProductModel.findById(CartItem.product)
 					.then(product=>{
-					console.log("::::222",product)	
+					
 						CartItem.product =  product;
 						CartItem.Price = product.price * CartItem.count;
 						return CartItem;
@@ -79,17 +81,29 @@ const newSchema = new mongoose.Schema({
 
 					
 				})
-			}
 
-			Promise.all(getCartItems())
+			Promise.all(getCartItems)
 			.then(CartItems=>{
-				
-				var CartItemTotolPrices = 0;
-				
+				let totaopricecart = 0;
 				CartItems.forEach(item=>{
-					CartItemTotolPrices += item.Price;
+					if(item.check){
+						totaopricecart += item.Price
+					}
 				})
-				this.cart.toatlPrice = CartItemTotolPrices;
+				this.cart.toatlPrice = totaopricecart;
+				
+				
+				this.cart.cartList = CartItems;
+
+				let hasallcheck = CartItems.find(item=>{
+					return item.check ==  false
+				})
+				if(hasallcheck){
+					console.log("110")
+					this.cart.totalCheck =  false;
+				}else{
+					this.cart.totalCheck =  true;
+				}
 				this.cart.cartList = CartItems;
 				resolve(this.cart)
 			})
