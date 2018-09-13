@@ -99,11 +99,53 @@ const newSchema = new mongoose.Schema({
 					return item.check ==  false
 				})
 				if(hasallcheck){
-					console.log("110")
+				
 					this.cart.totalCheck =  false;
 				}else{
 					this.cart.totalCheck =  true;
 				}
+				this.cart.cartList = CartItems;
+				resolve(this.cart)
+			})
+		}) 
+	}
+	//订单页面的订单获取
+	newSchema.methods.getOrder =function(){
+		return new Promise((resolve,reject)=>{
+			var _this = this;
+			if(!this.cart){
+				resolve({
+					cartList:[]
+				});
+			}
+
+			let checkList = this.cart.cartList.filter(item=>{
+				return item.check;
+			})
+			//map方法返回的就是一个数组
+			let getCartItems = checkList.map(CartItem=>{
+					
+					return ProductModel.findById(CartItem.product)
+					.then(product=>{
+					
+						CartItem.product =  product;
+						CartItem.Price = product.price * CartItem.count;
+						return CartItem;
+					})
+
+					
+				})
+
+			Promise.all(getCartItems)
+			.then(CartItems=>{
+				let totaopricecart = 0;
+				CartItems.forEach(item=>{
+					if(item.check){
+						totaopricecart += item.Price
+					}
+				})
+				this.cart.toatlPrice = totaopricecart;
+						
 				this.cart.cartList = CartItems;
 				resolve(this.cart)
 			})

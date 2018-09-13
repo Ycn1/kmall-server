@@ -28,6 +28,14 @@ const hmac = require('../util/hamc.js')
  			})
  		}
  		user.save()
+ 		.then(newUser=>{
+ 		
+ 				res.json({
+ 					code:0,
+ 					message:"插入成功",
+
+ 				}) 			
+ 		})
  	})
  	
  });
