@@ -2,10 +2,16 @@ const mongoose = require('mongoose');
 
 const ProductModel =  require('./product.js');
 
-const CartItem  =  new mongoose.Schema({
+const ProductSchema  =  new mongoose.Schema({
 	product:{
 		type:mongoose.Schema.Types.ObjectId,
 		ref:'Product'
+	},
+	name:{
+		type:String
+	},
+	image:{
+		type:String
 	},
 	Price:{
 		type:Number,
@@ -15,26 +21,18 @@ const CartItem  =  new mongoose.Schema({
 		type:Number,
 		deafult:1
 	},
-	check:{
-		type:Boolean,
-		default:true
-	}
-})
-
-const CartSchema  = new mongoose.Schema({
-	cartList:{
-		type:[CartItem]
-	},
 	toatlPrice:{
 		type:Number,
 		deafult:0
 	},
-	totalCheck:{
-		type:Boolean,
-		default:true
-	}
+
 })
+
+
 const shippingSchema  = new mongoose.Schema({
+	shippingId:{
+		type:String
+	},
 	name:{
 		type:String
 	},
@@ -55,36 +53,57 @@ const shippingSchema  = new mongoose.Schema({
 	}
 
 })
-const newSchema = new mongoose.Schema({
-		  	
-		  	username:{
+const orderSchema = new mongoose.Schema({
+			//订单所属
+		  	user:{
+		  		type:mongoose.Schema.Types.ObjectId,
+				ref:'User'
+		  	},
+		  	orderNo:{
 		  		type:String,
 		  	},
-		  	password:{
+		  	//支付金额
+		  	payment:{
+		  		type:Number,
+		  	},
+		  	paymentType:{
 		  		type:String,
+		  		enmu:["10","20"],//10-支付宝  20-微信
+		  		default:"10"
 		  	},
-		  	isAdmin:{
-		  		type:Boolean,
-		  		default:false
+		  	 paymentTypeDesc:{
+		  		type:String,
+		  		enmu:["支付宝","微信"],//10-支付宝  20-微信
+		  		default:"支付宝"
 		  	},
-		  	email:{
-		  		type:String
+		  	paymentTime:{
+		  		type:Date
 		  	},
-		  	phone:{
-		  		type:Number
+		  	status:{
+		  		type:String,
+		  		enmu:["10",'20',"30","40","50"],
+		  		default:"10" //10- 未支付  20 - 取消 30-已支付
 		  	},
-		  	cart:{
-		  		type:CartSchema
+		  	statusDesc:{
+		  		type:String,
+		  		enmu:["未支付",'取消',"已支付","已发货","完成"],
+		  		default:"未支付" //10- 未支付  20 - 取消 30-已支付  40-已发货 50-完成
 		  	},
+		  	//商品信息
+		  	productList:{
+		  		type:[ProductSchema],
+		  		deafult:[]
+		  	},
+		  	//配送地址
 		  	shipping:{
-		  		type:[shippingSchema]
+		  		type:shippingSchema
 		  	}
 
 		},{
 			timestamps:true
 		}); 
 
-	newSchema.methods.getCart =function(){
+	orderSchema.methods.getCart =function(){
 		return new Promise((resolve,reject)=>{
 			var _this = this;
 			if(!this.cart){
@@ -134,7 +153,7 @@ const newSchema = new mongoose.Schema({
 		}) 
 	}
 	//订单页面的订单获取
-	newSchema.methods.getOrder =function(){
+	orderSchema.methods.getOrder =function(){
 		return new Promise((resolve,reject)=>{
 			var _this = this;
 			if(!this.cart){
@@ -177,7 +196,7 @@ const newSchema = new mongoose.Schema({
 	}
 
 
-const UserModel = mongoose.model('User', newSchema);
+const OrderModel = mongoose.model('Order',orderSchema);
 
 
-module.exports = UserModel;
+module.exports = OrderModel;
