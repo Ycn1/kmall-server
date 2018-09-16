@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const ProductModel =  require('./product.js');
-
+const pagination = require('../util/pagination.js');
 const ProductSchema  =  new mongoose.Schema({
 	product:{
 		type:mongoose.Schema.Types.ObjectId,
@@ -71,7 +71,7 @@ const orderSchema = new mongoose.Schema({
 		  		enmu:["10","20"],//10-支付宝  20-微信
 		  		default:"10"
 		  	},
-		  	 paymentTypeDesc:{
+		  	paymentTypeDesc:{
 		  		type:String,
 		  		enmu:["支付宝","微信"],//10-支付宝  20-微信
 		  		default:"支付宝"
@@ -103,99 +103,20 @@ const orderSchema = new mongoose.Schema({
 			timestamps:true
 		}); 
 
-	orderSchema.methods.getCart =function(){
-		return new Promise((resolve,reject)=>{
-			var _this = this;
-			if(!this.cart){
-				resolve({
-					cartList:[]
-				});
-			}
-			//map方法返回的就是一个数组
-			let getCartItems =  this.cart.cartList.map(CartItem=>{
-				
-					return ProductModel.findById(CartItem.product)
-					.then(product=>{
-						console.log("123",product.price)
-						CartItem.product =  product;
-						CartItem.Price = product.price * CartItem.count;
-						return CartItem;
-					})
-
-					
-				})
-
-			Promise.all(getCartItems)
-			.then(CartItems=>{
-				let totaopricecart = 0;
-				CartItems.forEach(item=>{
-					if(item.check){
-						totaopricecart += item.Price
-					}
-				})
-				this.cart.toatlPrice = totaopricecart;
-				
-				
-				this.cart.cartList = CartItems;
-
-				let hasallcheck = CartItems.find(item=>{
-					return item.check ==  false
-				})
-				if(hasallcheck){
-				
-					this.cart.totalCheck =  false;
-				}else{
-					this.cart.totalCheck =  true;
-				}
-				this.cart.cartList = CartItems;
-				resolve(this.cart)
-			})
-		}) 
-	}
-	//订单页面的订单获取
-	orderSchema.methods.getOrder =function(){
-		return new Promise((resolve,reject)=>{
-			var _this = this;
-			if(!this.cart){
-				resolve({
-					cartList:[]
-				});
-			}
-
-			let checkList = this.cart.cartList.filter(item=>{
-				return item.check;
-			})
-			//map方法返回的就是一个数组
-			let getCartItems = checkList.map(CartItem=>{
-					
-					return ProductModel.findById(CartItem.product)
-					.then(product=>{
-					
-						CartItem.product =  product;
-						CartItem.Price = product.price * CartItem.count;
-						return CartItem;
-					})
-
-					
-				})
-
-			Promise.all(getCartItems)
-			.then(CartItems=>{
-				let totaopricecart = 0;
-				CartItems.forEach(item=>{
-					if(item.check){
-						totaopricecart += item.Price
-					}
-				})
-				this.cart.toatlPrice = totaopricecart;
-						
-				this.cart.cartList = CartItems;
-				resolve(this.cart)
-			})
-		}) 
-	}
-
-
+orderSchema.statics.getPaginationProduct = function(page,query={}){
+    return new Promise((resolve,reject)=>{
+      let options = {
+        page: page,
+        model:this, 
+        query:query,      
+        sort:{_id:-1}, 
+      }
+      pagination(options)
+      .then((data)=>{
+        resolve(data); 
+      })
+    })
+ }
 const OrderModel = mongoose.model('Order',orderSchema);
 
 

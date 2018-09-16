@@ -7,7 +7,19 @@ const ProductModel = require('../models/product.js');
 const hmac = require('../util/hamc.js')
 
  const router = new Router();
+//普通权限控制
+ router.use((req,res,next)=>{
+ 	
+ 	if(req.userInfo._id){
+ 		next()
+ 	}else{
+ 		res.json({
+			code:10
+		});
+ 	}
 
+ });
+ 
  router.post('/add',(req,res)=>{
  	let body = req.body;
  	UserModel.findById(req.userInfo._id)

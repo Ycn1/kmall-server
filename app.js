@@ -96,6 +96,8 @@ app.use('/cart',require('./routes/cart.js'));
 
 app.use('/order',require('./routes/order.js'));
 
+app.use('/payment',require('./routes/payment.js'));
+
 app.use('/shippings',require('./routes/shippings.js'));
 
 app.use('/article',require('./routes/article.js'));
