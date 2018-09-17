@@ -24,7 +24,7 @@ const hmac = require('../util/hamc.js')
 
  	
  });
- router.get('/status',(req,res)=>}{
+ router.get('/status',(req,res)=>{
  	OrderModel
  		.findOne({orderNo:req.query.orderNo,},'status')
  		.then(order=>{

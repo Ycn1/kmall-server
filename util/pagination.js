@@ -8,7 +8,7 @@ let pagination = (options) =>{
 	 		page = parseInt(options.page);
 	 	}
 
-	 	let limit = 2;
+	 	let limit =5;
 	 	
 	 	if(page <= 0){
 	 		page = 1;

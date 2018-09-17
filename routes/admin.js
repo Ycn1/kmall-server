@@ -1,6 +1,8 @@
  const Router = require('express').Router;
 
 const UserModel = require('../models/user.js');
+const OrderModel = require('../models/order.js');
+const ProductModel = require('../models/product.js');
 const path = require('path');
 const CommentModel = require('../models/comment.js');
 
@@ -17,18 +19,6 @@ const hmac = require('../util/hamc.js')
 
 var upload = multer({ dest: 'public/uploads/' })
 
-/*router.use('/init',(req,res)=>{
-				// hmac.update(req.body.password);
-				 new UserModel({
-					username:"admin",
-					password:hmac("admin"),
-					isAdmin:true
-					
-				
-				}).save((err,data)=>{
-					res.send('ok');
-				})
-})*/
  router.get('/',(req,res)=>{
 	res.render('admin/index',{
 		userInfo:req.userInfo
@@ -93,17 +83,24 @@ var upload = multer({ dest: 'public/uploads/' })
 
  });
  router.get('/count',(req,res)=>{
-	let result  = {
-		code:0,// 0 代表成功 
-		message:'',
-		data:{
-			usernumber:1666,
-			ordernumber:1888,
-			productnumber:1999
-		}
-
-	}
-	res.json(result)
+	
+		UserModel.estimatedDocumentCount()
+		.then(usernumber=>{
+			OrderModel.estimatedDocumentCount()
+			.then(ordernumber=>{
+				ProductModel.estimatedDocumentCount()
+				.then(productnumber=>{
+					res.json({
+						code:0,
+						data:{
+							usernumber:usernumber,
+							ordernumber:ordernumber,
+							productnumber:productnumber
+						}
+					})
+				})
+			})
+		})
 });
 
  router.get('/users',(req,res)=>{

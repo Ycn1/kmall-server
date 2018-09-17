@@ -141,12 +141,82 @@ const hmac = require('../util/hamc.js')
 	})
  });
 
- //获取订单详情页
+//获取全部订单
+ router.get('/order',(req,res)=>{
+ 	let page = req.query.page;
+ 	OrderModel
+ 	.getPaginationProduct(page)
+	.then(data=>{
+		
+		res.json({
+			code :0,
+			
+			data:{
+				list:data.list,
+				current:data.current,
+				total:data.total,
+				pageSize:data.pageSize,
+				status:data.status
+			}
+		})
+	})
+});
+//搜索订单号
+
+router.get('/search',(req,res)=>{
+	
+
+	let id = req.query.id;
+
+	let keyword = req.query.keyword;
+
+	let page =  req.query.page;
+	OrderModel
+	.getPaginationProduct(page,{
+		orderNo:{$regex:new RegExp(keyword,'i')}
+	})
+	.then(data=>{
+			res.json({
+				code :0,
+				
+				data:{
+					list:data.list,
+					current:data.current,
+					total:data.total,
+					pageSize:data.pageSize,
+					status:data.status,
+					keyword:keyword
+				}
+			})
+	})
+		.catch(e=>{
+			res.json({
+				code:1,
+				message:"失败"
+			})
+		})
+			
+})
+ //获取订单详情页 用户界面
  router.get('/detail',(req,res)=>{
  
  	console.log(req.query.orderNo)
  	OrderModel
  	.findOne({orderNo:req.query.orderNo,user:req.userInfo._id})
+	.then(data=>{
+		res.json({
+			code :0,
+			
+			data:data
+		})
+	})
+ });
+ //获取订单详情  管理员界面
+  router.get('/detailAdmin',(req,res)=>{
+ 
+ 	console.log(req.query.orderNo)
+ 	OrderModel
+ 	.findOne({orderNo:req.query.orderNo})
 	.then(data=>{
 		res.json({
 			code :0,

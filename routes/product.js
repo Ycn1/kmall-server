@@ -245,7 +245,7 @@ router.get('/edit',(req,res)=>{
 			})
 		})
 			
-})
+});
 router.get('/serarchName',(req,res)=>{
 	
 
