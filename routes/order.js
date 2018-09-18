@@ -200,7 +200,7 @@ router.get('/search',(req,res)=>{
  //获取订单详情页 用户界面
  router.get('/detail',(req,res)=>{
  
- 	console.log(req.query.orderNo)
+
  	OrderModel
  	.findOne({orderNo:req.query.orderNo,user:req.userInfo._id})
 	.then(data=>{
@@ -214,7 +214,7 @@ router.get('/search',(req,res)=>{
  //获取订单详情  管理员界面
   router.get('/detailAdmin',(req,res)=>{
  
- 	console.log(req.query.orderNo)
+
  	OrderModel
  	.findOne({orderNo:req.query.orderNo})
 	.then(data=>{
@@ -231,6 +231,33 @@ router.get('/search',(req,res)=>{
  		.findOneAndUpdate(
  			{orderNo:req.body.orderNo,user:req.userInfo._id},
  			{status:"20",statusDesc:"取消"},
+ 			{new :true}
+ 			)
+		.then(data=>{
+			console.log("data",data)
+		
+			res.json({
+				code :0,
+				
+				data:data
+			})
+		})
+		.catch(e=>{
+			res.json({
+				code :0,
+				
+				message:"取消订单失败"
+			})
+		})
+	});
+ //发货按钮
+
+ router.put('/deliver',(req,res)=>{
+ 	console.log(req.body.orderNo)
+ 		OrderModel
+ 		.findOneAndUpdate(
+ 			{orderNo:req.body.orderNo},
+ 			{status:"40",statusDesc:"已发货"},
  			{new :true}
  			)
 		.then(data=>{
